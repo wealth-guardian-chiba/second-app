@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 
 app = Flask(__name)
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         uploaded_file = request.files['file']

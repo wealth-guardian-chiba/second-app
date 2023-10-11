@@ -1,3 +1,5 @@
+pip install -r requirment.txt
+
 from flask import Flask, request, render_template, jsonify, send_file
 import os
 import main_function as mf

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, render_template, jsonify, send_file
 import os
 import main_function as mf
 import pandas as pd
@@ -6,26 +6,28 @@ from openpyxl import load_workbook
 
 app = Flask(__name)
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    uploaded_file = request.files['file']
-    if uploaded_file:
-        if upload_file.filename.endwith('.xlsx'):
-            file_path = os.path.join('uploads', uploaded_file.filename)
-            uploaded_file.save(file_path)
-            df = pd.read_excel(filepath)
-            df1 = mf.function1(df)
-            df2 = mf.function2(df)
-
-            edited_file_path = os.path.join('edited', 'edited_' + uploaded_file.filename)
-            df1.to_excel(edited_file_path, index=False, engine='openpyxl', sheet_name="債券リスト")
-            df2.to_excel(edited_file_path, index=False, engine='openpyxl', sheet_name="金利CF表")
-            # ここで編集されたファイルを保存
-
-            return jsonify({'message': 'File edited and saved successfully.', 'edited_file_path': edited_file_path})
-        else:
-            return jsonify({'error': 'Invalid file type. Please uploed an Excel file with the .xlsx extension.'})
-    return 'File not uploaded.'
+    if request.method == 'POST':
+        uploaded_file = request.files['file']
+        if uploaded_file:
+            if upload_file.filename.endwith('.xlsx'):
+                file_path = os.path.join('uploads', uploaded_file.filename)
+                uploaded_file.save(file_path)
+                df = pd.read_excel(filepath)
+                df1 = mf.function1(df)
+                df2 = mf.function2(df)
+    
+                edited_file_path = os.path.join('edited', 'edited_' + uploaded_file.filename)
+                df1.to_excel(edited_file_path, index=False, engine='openpyxl', sheet_name="債券リスト")
+                df2.to_excel(edited_file_path, index=False, engine='openpyxl', sheet_name="金利CF表")
+                # ここで編集されたファイルを保存
+    
+                return jsonify({'message': 'File edited and saved successfully.', 'edited_file_path': edited_file_path})
+            else:
+                return jsonify({'error': 'Invalid file type. Please uploed an Excel file with the .xlsx extension.'})
+        return 'File not uploaded.'
+    return render_template('index.html')
 
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
